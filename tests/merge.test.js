@@ -84,6 +84,27 @@ const item = (productId, addedAt, variant = null) => ({ productId, variant, adde
   assertEqual(decodeList(encodeList([{ foo: "bar" }])), null, "well-formed base64 but wrong item shape -> null");
   assertEqual(decodeList(encodeList("just a string, not an array")), null, "valid JSON but not an array -> null");
   assertEqual(decodeList(encodeList([{ productId: "x", addedAt: "not-a-date" }])), null, "invalid addedAt -> null");
+  assertEqual(decodeList(encodeList([{ productId: "", addedAt: "2026-01-01T00:00:00.000Z" }])), null, "empty-string productId -> null");
+  assertEqual(decodeList(encodeList([{ productId: "x", variant: 42, addedAt: "2026-01-01T00:00:00.000Z" }])), null, "non-string variant (number) -> null");
+  assertEqual(decodeList(encodeList([{ productId: "x", variant: { evil: true }, addedAt: "2026-01-01T00:00:00.000Z" }])), null, "non-string variant (object) -> null");
+}
+
+// --- decodeList strips unknown fields, so an import can't smuggle extra
+//     data into what gets stored/rendered ---
+{
+  const code = encodeList([{ productId: "x", addedAt: "2026-01-01T00:00:00.000Z", __proto__evil: "nope", extra: "field" }]);
+  const decoded = decodeList(code);
+  assertEqual(Object.keys(decoded[0]).sort(), ["addedAt", "productId", "variant"], "decoded item has only the 3 known fields, extras dropped");
+}
+
+// --- a productId/variant that LOOKS like markup must survive as inert
+//     text through the encode/decode round trip (rendering safety is
+//     app.js's job — this just confirms the data layer doesn't choke on
+//     or silently mangle it) ---
+{
+  const payload = [item('<img src=x onerror="alert(1)">', "2026-01-01T00:00:00.000Z")];
+  const decoded = decodeList(encodeList(payload));
+  assertEqual(decoded, payload, "markup-like productId round-trips as inert data, unmodified");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

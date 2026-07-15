@@ -1,58 +1,100 @@
+/*
+  Palette/type pulled from getswym.com's actual computed styles (not
+  guessed): ink navy #0D2236, link blue #2B72B4, CTA lime #A7E162, font
+  Public Sans, fully-pill buttons (border-radius: 200px), soft organic
+  background shapes. Layout/markup below is original, not copied.
+*/
 :root {
-  --ink: #1c1c1e;
-  --muted: #6b6b70;
-  --line: #e4e4e7;
-  --bg: #fafafa;
+  --ink: #0D2236;
+  --muted: #5b6b78;
+  --line: #e2e8ee;
+  --bg: #fbfcfd;
   --card: #ffffff;
-  --accent: #d4145a;
-  --accent-soft: #fbe6ee;
-  --radius: 10px;
+  --blue: #2B72B4;
+  --blue-soft: #e8f1f9;
+  --lime: #A7E162;
+  --lime-ink: #24421a;
+  --radius: 16px;
+  --pill: 200px;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--ink);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Soft organic accents, CSS-only (no image assets) — echoes the blob
+   shapes on swym's own marketing site without copying them. */
+.bg-accent {
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.bg-accent-1 {
+  width: 520px; height: 420px;
+  top: -160px; left: -160px;
+  background: radial-gradient(circle, var(--lime), transparent 70%);
+}
+.bg-accent-2 {
+  width: 460px; height: 380px;
+  top: 120px; right: -180px;
+  background: radial-gradient(circle, var(--blue-soft), transparent 70%);
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px;
-  background: var(--card);
+  padding: 16px 28px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.brand { font-weight: 700; font-size: 1.1rem; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
+.brand-mark { width: 30px; height: 21px; }
+.brand-mark .mark-a { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; }
+.brand-mark .mark-b { fill: none; stroke: var(--lime); stroke-width: 3; stroke-linecap: round; }
 
 .session-controls { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
 .session-controls input {
-  padding: 6px 10px;
+  padding: 8px 14px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--pill);
+  font-family: inherit;
   font-size: 0.9rem;
   width: 140px;
 }
+.session-controls input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 .session-controls button {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 18px;
+  border-radius: var(--pill);
   border: none;
-  background: var(--ink);
-  color: white;
+  background: var(--lime);
+  color: var(--lime-ink);
+  font-family: inherit;
+  font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
 }
+.session-controls button:hover { filter: brightness(0.96); }
 .session-controls button.secondary {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--line);
+  font-weight: 500;
 }
 .session-label { color: var(--muted); }
 
@@ -60,14 +102,14 @@ body {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 24px;
-  padding: 24px;
+  padding: 28px;
   max-width: 1100px;
   margin: 0 auto;
   align-items: start;
 }
 
-h1 { font-size: 1.3rem; margin: 0 0 12px; }
-h2 { font-size: 1.1rem; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
+h1 { font-size: 1.6rem; font-weight: 300; margin: 0 0 16px; letter-spacing: -0.01em; }
+h2 { font-size: 1.1rem; font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
 
 .product-grid {
   display: grid;
@@ -79,67 +121,88 @@ h2 { font-size: 1.1rem; margin: 0 0 4px; display: flex; align-items: center; gap
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
+.product-card:hover { box-shadow: 0 8px 24px rgba(13, 34, 54, 0.08); transform: translateY(-1px); }
 
-.product-emoji { font-size: 2.2rem; line-height: 1; }
+.product-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--blue-soft);
+  border-radius: 12px;
+}
 .product-name { font-weight: 600; font-size: 0.95rem; }
-.product-meta { color: var(--muted); font-size: 0.82rem; }
-.product-price { font-weight: 600; }
+.product-meta { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.product-price { font-weight: 700; }
 
 .product-card select {
-  padding: 5px 6px;
-  border-radius: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
   border: 1px solid var(--line);
+  font-family: inherit;
   font-size: 0.85rem;
 }
 
 .wishlist-btn {
   margin-top: auto;
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   background: white;
-  border-radius: 999px;
-  padding: 7px 10px;
+  border-radius: var(--pill);
+  padding: 8px 12px;
   cursor: pointer;
+  font-family: inherit;
   font-size: 0.85rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: all 0.15s ease;
 }
+.wishlist-btn:hover { border-color: var(--blue); }
 .wishlist-btn.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
 }
 
 .wishlist-panel {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 18px;
   position: sticky;
-  top: 76px;
+  top: 84px;
 }
 
 .count { color: var(--muted); font-weight: 400; font-size: 0.85rem; }
-.active-list-label { color: var(--muted); font-size: 0.8rem; margin: 0 0 10px; }
+.active-list-label { color: var(--muted); font-size: 0.8rem; margin: 0 0 12px; }
 
 .wishlist-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
 
 .wishlist-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 8px;
   font-size: 0.85rem;
 }
 .wishlist-item.unavailable { opacity: 0.6; font-style: italic; }
-.wishlist-item .emoji { font-size: 1.3rem; }
+.wishlist-item .emoji {
+  font-size: 1.1rem;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--blue-soft);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
 .wishlist-item .info { flex: 1; }
 .wishlist-item .remove-btn {
   border: none;
@@ -147,40 +210,44 @@ h2 { font-size: 1.1rem; margin: 0 0 4px; display: flex; align-items: center; gap
   color: var(--muted);
   cursor: pointer;
   font-size: 1rem;
+  padding: 4px;
 }
-.wishlist-item .remove-btn:hover { color: var(--accent); }
+.wishlist-item .remove-btn:hover { color: var(--blue); }
 
 .empty-note { color: var(--muted); font-size: 0.85rem; }
 
-.merge-tools { margin-top: 14px; font-size: 0.85rem; }
-.merge-tools summary { cursor: pointer; font-weight: 600; }
+.merge-tools { margin-top: 16px; font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 14px; }
+.merge-tools summary { cursor: pointer; font-weight: 600; color: var(--blue); }
 .merge-tools-body { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
 .merge-tools-body textarea {
   width: 100%;
   min-height: 60px;
-  font-family: monospace;
+  font-family: "SF Mono", Menlo, monospace;
   font-size: 0.75rem;
-  padding: 6px;
-  border-radius: 6px;
+  padding: 8px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   resize: vertical;
 }
 .merge-tools-body label { font-size: 0.8rem; color: var(--muted); }
 
 button.secondary {
-  padding: 7px 10px;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: var(--pill);
   border: 1px solid var(--line);
   background: white;
+  font-family: inherit;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 500;
 }
+button.secondary:hover { border-color: var(--blue); color: var(--blue); }
 
 .status-message {
   margin-top: 12px;
   font-size: 0.82rem;
   min-height: 1.2em;
-  color: var(--accent);
+  color: var(--blue);
 }
 .status-message.error { color: #b3261e; }
 

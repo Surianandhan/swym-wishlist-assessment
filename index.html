@@ -4,11 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Swym Sample Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <div class="bg-accent bg-accent-1" aria-hidden="true"></div>
+  <div class="bg-accent bg-accent-2" aria-hidden="true"></div>
+
   <header class="topbar">
-    <div class="brand">Swym Sample Store</div>
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 28" aria-hidden="true">
+        <path d="M2 20 C 9 6, 16 6, 20 14 C 24 22, 31 22, 38 8" class="mark-a" />
+        <path d="M2 14 C 9 24, 16 24, 20 16 C 24 8, 31 8, 38 20" class="mark-b" />
+      </svg>
+      <span>Swym Sample Store</span>
+    </div>
     <div class="session-controls" id="session-controls"></div>
   </header>
 

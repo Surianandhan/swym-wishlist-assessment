@@ -46,10 +46,17 @@ export function decodeList(code) {
     const items = JSON.parse(fromBase64(code.trim()));
     if (!Array.isArray(items)) return null;
     for (const item of items) {
-      if (typeof item.productId !== "string") return null;
+      if (typeof item.productId !== "string" || item.productId.trim() === "") return null;
+      if (item.variant !== null && item.variant !== undefined && typeof item.variant !== "string") return null;
       if (typeof item.addedAt !== "string" || isNaN(new Date(item.addedAt))) return null;
     }
-    return items;
+    // Normalize: strip any keys beyond the three we validated, so an
+    // import can't smuggle extra fields into stored/rendered data.
+    return items.map((item) => ({
+      productId: item.productId,
+      variant: item.variant ?? null,
+      addedAt: item.addedAt,
+    }));
   } catch {
     return null;
   }

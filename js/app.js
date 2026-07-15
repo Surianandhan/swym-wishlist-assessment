@@ -5,8 +5,12 @@ import {
   getGuestList, setGuestList,
   getAccountList, setAccountList,
   getActiveList, setActiveList,
-  accountExists,
+  accountExists, getAccountDisplayName, setAccountDisplayName,
 } from "./storage.js";
+
+const STORAGE_FAILED_MSG =
+  "Couldn't save that — your browser may be blocking local storage " +
+  "(e.g. private browsing) or storage is full. Nothing was changed.";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -33,14 +37,14 @@ function isInActiveList(productId, variant) {
 function addToActiveList(productId, variant) {
   const list = getActiveList();
   const key = itemKey({ productId, variant });
-  if (list.some((it) => itemKey(it) === key)) return; // already there
+  if (list.some((it) => itemKey(it) === key)) return true; // already there
   list.push({ productId, variant, addedAt: new Date().toISOString() });
-  setActiveList(list);
+  return setActiveList(list);
 }
 
 function removeFromActiveList(productId, variant) {
   const key = itemKey({ productId, variant });
-  setActiveList(getActiveList().filter((it) => itemKey(it) !== key));
+  return setActiveList(getActiveList().filter((it) => itemKey(it) !== key));
 }
 
 function renderProducts() {
@@ -79,12 +83,15 @@ function renderProducts() {
 
     card.querySelector(".wishlist-btn").addEventListener("click", () => {
       const variant = hasVariants ? selectedVariant[product.id] : null;
-      if (isInActiveList(product.id, variant)) {
-        removeFromActiveList(product.id, variant);
-        showStatus(`Removed ${product.name}${variant ? ` (${variant})` : ""} from your wishlist.`);
+      const removing = isInActiveList(product.id, variant);
+      const ok = removing
+        ? removeFromActiveList(product.id, variant)
+        : addToActiveList(product.id, variant);
+      if (!ok) {
+        showStatus(STORAGE_FAILED_MSG, true);
       } else {
-        addToActiveList(product.id, variant);
-        showStatus(`Added ${product.name}${variant ? ` (${variant})` : ""} to your wishlist.`);
+        const label = `${product.name}${variant ? ` (${variant})` : ""}`;
+        showStatus(removing ? `Removed ${label} from your wishlist.` : `Added ${label} to your wishlist.`);
       }
       renderAll();
     });
@@ -110,27 +117,55 @@ function renderWishlist() {
 
   for (const item of [...list].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt))) {
     const product = getProduct(item.productId);
-    const li = document.createElement("li");
-    li.className = "wishlist-item" + (product ? "" : " unavailable");
-    li.innerHTML = product
-      ? `<span class="emoji">${product.emoji}</span>
-         <span class="info">${product.name}${item.variant ? ` — ${item.variant}` : ""}<br>
-           <small>$${product.price.toFixed(2)} · added ${new Date(item.addedAt).toLocaleString()}</small>
-         </span>
-         <button class="remove-btn" title="Remove">✕</button>`
-      : `<span class="emoji">❔</span>
-         <span class="info">Item unavailable (product "${item.productId}" no longer in catalog)<br>
-           <small>added ${new Date(item.addedAt).toLocaleString()}</small>
-         </span>
-         <button class="remove-btn" title="Remove">✕</button>`;
-
-    li.querySelector(".remove-btn").addEventListener("click", () => {
-      removeFromActiveList(item.productId, item.variant);
-      renderAll();
-    });
-
-    wishlistItemsEl.appendChild(li);
+    wishlistItemsEl.appendChild(buildWishlistRow(item, product));
   }
+}
+
+// Built with createElement/textContent rather than innerHTML because
+// item.productId and item.variant can come from an imported code — i.e.
+// attacker-controlled string data, not just our own catalog. An earlier
+// innerHTML-based version of this function was exploitable: importing a
+// code with productId `<img src=x onerror=...>` executed script on
+// render (confirmed via a live payload before this fix, both through the
+// "unavailable item" path and through the variant field on a real
+// product). textContent never interprets its input as markup, so the
+// same payload just renders as literal text.
+function buildWishlistRow(item, product) {
+  const li = document.createElement("li");
+  const emoji = document.createElement("span");
+  emoji.className = "emoji";
+  const info = document.createElement("span");
+  info.className = "info";
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "remove-btn";
+  removeBtn.title = "Remove";
+  removeBtn.textContent = "✕";
+
+  if (product) {
+    li.className = "wishlist-item";
+    emoji.textContent = product.emoji;
+    const titleLine = document.createElement("span");
+    titleLine.textContent = product.name + (item.variant ? ` — ${item.variant}` : "");
+    const small = document.createElement("small");
+    small.textContent = `$${product.price.toFixed(2)} · added ${new Date(item.addedAt).toLocaleString()}`;
+    info.append(titleLine, document.createElement("br"), small);
+  } else {
+    li.className = "wishlist-item unavailable";
+    emoji.textContent = "❔";
+    const titleLine = document.createElement("span");
+    titleLine.textContent = `Item unavailable (product "${item.productId}" no longer in catalog)`;
+    const small = document.createElement("small");
+    small.textContent = `added ${new Date(item.addedAt).toLocaleString()}`;
+    info.append(titleLine, document.createElement("br"), small);
+  }
+
+  removeBtn.addEventListener("click", () => {
+    if (!removeFromActiveList(item.productId, item.variant)) showStatus(STORAGE_FAILED_MSG, true);
+    renderAll();
+  });
+
+  li.append(emoji, info, removeBtn);
+  return li;
 }
 
 function renderSession() {
@@ -145,8 +180,11 @@ function renderSession() {
     signOutBtn.className = "secondary";
     signOutBtn.textContent = "Sign out";
     signOutBtn.addEventListener("click", () => {
-      setSession({ mode: "guest" });
-      showStatus("Signed out. You're browsing as a guest again.");
+      if (setSession({ mode: "guest" })) {
+        showStatus("Signed out. You're browsing as a guest again.");
+      } else {
+        showStatus(STORAGE_FAILED_MSG, true);
+      }
       renderAll();
     });
     sessionControlsEl.append(label, signOutBtn);
@@ -172,32 +210,45 @@ function handleSignIn(rawName) {
 
   const guestList = getGuestList();
   const isNewAccount = !accountExists(name);
+  let ok = true;
 
   if (isNewAccount) {
     // Nothing to merge against — the guest items simply become this
-    // account's list.
-    setAccountList(name, guestList);
-    setGuestList([]);
-    setSession({ mode: "account", name });
-    showStatus(
-      guestList.length
-        ? `Created account "${name}" with your ${guestList.length} guest item(s).`
-        : `Created account "${name}".`
-    );
+    // account's list. The typed casing becomes canonical for this
+    // account's display name from now on.
+    ok = setAccountDisplayName(name) && ok;
+    ok = setAccountList(name, guestList) && ok;
+    ok = setGuestList([]) && ok;
+    ok = setSession({ mode: "account", name }) && ok;
+    if (ok) {
+      showStatus(
+        guestList.length
+          ? `Created account "${name}" with your ${guestList.length} guest item(s).`
+          : `Created account "${name}".`
+      );
+    }
   } else {
+    // Sign-in is matched case-insensitively, but display the name using
+    // whatever casing this account was originally created with — not
+    // whatever the user just typed — so "Alice" doesn't start rendering
+    // as "alice" just because that's how she typed it this time.
+    const canonicalName = getAccountDisplayName(name);
     const existing = getAccountList(name);
     const merged = mergeLists(existing, guestList);
     const dedupedCount = existing.length + guestList.length - merged.length;
-    setAccountList(name, merged);
-    setGuestList([]);
-    setSession({ mode: "account", name });
-    showStatus(
-      `Signed in as "${name}". Merged ${guestList.length} guest item(s) into your ` +
-      `existing ${existing.length}-item list → ${merged.length} total` +
-      (dedupedCount > 0 ? ` (${dedupedCount} were already on both lists).` : ".")
-    );
+    ok = setAccountList(name, merged) && ok;
+    ok = setGuestList([]) && ok;
+    ok = setSession({ mode: "account", name: canonicalName }) && ok;
+    if (ok) {
+      showStatus(
+        `Signed in as "${canonicalName}". Merged ${guestList.length} guest item(s) into your ` +
+        `existing ${existing.length}-item list → ${merged.length} total` +
+        (dedupedCount > 0 ? ` (${dedupedCount} were already on both lists).` : ".")
+      );
+    }
   }
 
+  if (!ok) showStatus(STORAGE_FAILED_MSG, true);
   renderAll();
 }
 
@@ -217,7 +268,10 @@ function handleImport() {
   const current = getActiveList();
   const merged = mergeLists(current, imported);
   const dedupedCount = current.length + imported.length - merged.length;
-  setActiveList(merged);
+  if (!setActiveList(merged)) {
+    showStatus(STORAGE_FAILED_MSG, true);
+    return;
+  }
   showStatus(
     `Imported ${imported.length} item(s), merged into your current ${current.length}-item list → ` +
     `${merged.length} total` + (dedupedCount > 0 ? ` (${dedupedCount} were already on your list).` : ".")
