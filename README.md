@@ -25,6 +25,26 @@ the entry with the earlier `addedAt` wins. Merging is idempotent — merging
 the same list into itself, or re-importing the same code twice, does not
 create duplicates.
 
+## Design tensions the brief left open, and how they were resolved
+
+- **GitHub Pages is static-only, no server.** → Persistence had to be
+  `localStorage`, so "signing in" is a namespaced local identity, not
+  real auth. Stated explicitly as a scoped-out simplification, not an
+  oversight.
+- **"Merge two distinct lists" doesn't say how a user gets two lists.**
+  → Resolved as guest→account (mirrors Swym's actual product) plus a
+  share link (also realistic, and independently testable without two
+  devices).
+- **A naive merge just concatenates.** → Deduped by `(productId,
+  variant)`, earliest `addedAt` wins, verified idempotent.
+- **First export/import draft was a manual copy/paste code box.** →
+  Replaced with a real shareable link: one-click copy, confirm-before-
+  merge on the receiving end, no data changes without an explicit click.
+- **First render pass trusted imported data.** → A crafted import code
+  turned out to execute script via unescaped `innerHTML` (confirmed live
+  before fixing, not assumed). Fixed with input validation at the decode
+  boundary and safe DOM construction at the render sink.
+
 ## Running locally
 
 No build step. Serve the directory with any static file server, e.g.:
