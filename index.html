@@ -31,21 +31,22 @@
     </section>
 
     <aside class="wishlist-panel">
+      <div id="share-banner" class="share-banner" hidden>
+        <span id="share-banner-text"></span>
+        <div class="share-banner-actions">
+          <button id="share-merge-btn">Merge into my wishlist</button>
+          <button id="share-dismiss-btn" class="secondary">Dismiss</button>
+        </div>
+      </div>
+
       <h2>Wishlist <span id="wishlist-count" class="count"></span></h2>
       <p class="active-list-label" id="active-list-label"></p>
       <ul class="wishlist-items" id="wishlist-items"></ul>
 
-      <details class="merge-tools">
-        <summary>Export / Import (merge lists manually)</summary>
-        <div class="merge-tools-body">
-          <button id="export-btn" class="secondary">Export current list as code</button>
-          <textarea id="export-output" readonly placeholder="Exported code will appear here"></textarea>
-
-          <label for="import-input">Paste a code to merge into this list</label>
-          <textarea id="import-input" placeholder="Paste an exported code here"></textarea>
-          <button id="import-btn" class="secondary">Import & Merge</button>
-        </div>
-      </details>
+      <div class="share-row">
+        <button id="share-btn" class="secondary">🔗 Share my wishlist</button>
+        <textarea id="share-output" class="share-output" readonly hidden></textarea>
+      </div>
 
       <p id="status-message" class="status-message" role="status"></p>
     </aside>

@@ -216,20 +216,46 @@ h2 { font-size: 1.1rem; font-weight: 600; margin: 0 0 4px; display: flex; align-
 
 .empty-note { color: var(--muted); font-size: 0.85rem; }
 
-.merge-tools { margin-top: 16px; font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 14px; }
-.merge-tools summary { cursor: pointer; font-weight: 600; color: var(--blue); }
-.merge-tools-body { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-.merge-tools-body textarea {
+.share-row { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.share-output {
   width: 100%;
-  min-height: 60px;
+  min-height: 44px;
+  margin-top: 8px;
   font-family: "SF Mono", Menlo, monospace;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   padding: 8px;
   border-radius: 10px;
   border: 1px solid var(--line);
   resize: vertical;
+  background: var(--blue-soft);
 }
-.merge-tools-body label { font-size: 0.8rem; color: var(--muted); }
+
+.share-banner {
+  background: var(--blue-soft);
+  border: 1px solid var(--blue);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+.share-banner-actions { display: flex; gap: 8px; margin-top: 10px; }
+.share-banner-actions button {
+  padding: 7px 14px;
+  border-radius: var(--pill);
+  border: none;
+  background: var(--lime);
+  color: var(--lime-ink);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.share-banner-actions button.secondary {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 500;
+}
 
 button.secondary {
   padding: 8px 14px;

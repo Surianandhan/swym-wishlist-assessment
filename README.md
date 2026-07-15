@@ -11,10 +11,14 @@ Two ways to reach the same `mergeLists()` logic ([js/merge.js](js/merge.js)):
    in" with a name. If that name already has a saved list, your guest
    items merge into it. Sign out, add different items as a guest again,
    sign back in with the same name — the two lists merge again.
-2. **Export / Import.** Any list can be exported to a short code (open the
-   "Export / Import" panel in the wishlist sidebar). Pasting a code
-   elsewhere merges it into the active list — useful for testing merge
-   behavior directly without simulating two sessions.
+2. **Share link.** "🔗 Share my wishlist" copies a URL encoding the
+   current list to the clipboard (falls back to a visible, selectable
+   field if clipboard access is blocked). Opening that link — in another
+   tab, another browser, or handed to someone else — shows a confirm
+   banner ("Someone shared N items with you") rather than merging
+   silently; accepting merges it into whatever list is currently active
+   there. This is also how merge behavior can be exercised directly with
+   a hand-crafted `?shared=<code>` link, without needing two devices.
 
 Merge rule: items are deduped by `(productId, variant)`. On a duplicate,
 the entry with the earlier `addedAt` wins. Merging is idempotent — merging
