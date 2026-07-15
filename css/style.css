@@ -1,0 +1,190 @@
+:root {
+  --ink: #1c1c1e;
+  --muted: #6b6b70;
+  --line: #e4e4e7;
+  --bg: #fafafa;
+  --card: #ffffff;
+  --accent: #d4145a;
+  --accent-soft: #fbe6ee;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand { font-weight: 700; font-size: 1.1rem; }
+
+.session-controls { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+.session-controls input {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 140px;
+}
+.session-controls button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: var(--ink);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.session-controls button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.session-label { color: var(--muted); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+h1 { font-size: 1.3rem; margin: 0 0 12px; }
+h2 { font-size: 1.1rem; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-emoji { font-size: 2.2rem; line-height: 1; }
+.product-name { font-weight: 600; font-size: 0.95rem; }
+.product-meta { color: var(--muted); font-size: 0.82rem; }
+.product-price { font-weight: 600; }
+
+.product-card select {
+  padding: 5px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.wishlist-btn {
+  margin-top: auto;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 999px;
+  padding: 7px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wishlist-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.wishlist-panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: sticky;
+  top: 76px;
+}
+
+.count { color: var(--muted); font-weight: 400; font-size: 0.85rem; }
+.active-list-label { color: var(--muted); font-size: 0.8rem; margin: 0 0 10px; }
+
+.wishlist-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+
+.wishlist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 0.85rem;
+}
+.wishlist-item.unavailable { opacity: 0.6; font-style: italic; }
+.wishlist-item .emoji { font-size: 1.3rem; }
+.wishlist-item .info { flex: 1; }
+.wishlist-item .remove-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+}
+.wishlist-item .remove-btn:hover { color: var(--accent); }
+
+.empty-note { color: var(--muted); font-size: 0.85rem; }
+
+.merge-tools { margin-top: 14px; font-size: 0.85rem; }
+.merge-tools summary { cursor: pointer; font-weight: 600; }
+.merge-tools-body { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.merge-tools-body textarea {
+  width: 100%;
+  min-height: 60px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  resize: vertical;
+}
+.merge-tools-body label { font-size: 0.8rem; color: var(--muted); }
+
+button.secondary {
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.status-message {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  min-height: 1.2em;
+  color: var(--accent);
+}
+.status-message.error { color: #b3261e; }
+
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .wishlist-panel { position: static; }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "swym-wishlist-assessment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/merge.test.js"
+  }
+}

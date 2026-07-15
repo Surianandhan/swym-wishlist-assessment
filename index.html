@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swym Sample Store</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Swym Sample Store</div>
+    <div class="session-controls" id="session-controls"></div>
+  </header>
+
+  <main class="layout">
+    <section class="storefront">
+      <h1>Shop</h1>
+      <div class="product-grid" id="product-grid"></div>
+    </section>
+
+    <aside class="wishlist-panel">
+      <h2>Wishlist <span id="wishlist-count" class="count"></span></h2>
+      <p class="active-list-label" id="active-list-label"></p>
+      <ul class="wishlist-items" id="wishlist-items"></ul>
+
+      <details class="merge-tools">
+        <summary>Export / Import (merge lists manually)</summary>
+        <div class="merge-tools-body">
+          <button id="export-btn" class="secondary">Export current list as code</button>
+          <textarea id="export-output" readonly placeholder="Exported code will appear here"></textarea>
+
+          <label for="import-input">Paste a code to merge into this list</label>
+          <textarea id="import-input" placeholder="Paste an exported code here"></textarea>
+          <button id="import-btn" class="secondary">Import & Merge</button>
+        </div>
+      </details>
+
+      <p id="status-message" class="status-message" role="status"></p>
+    </aside>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
